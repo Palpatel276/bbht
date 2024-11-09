@@ -5,7 +5,7 @@ A bash script that will automatically install a list of bug hunting tools I some
 
 ```sh
 
-git clone https://github.com/0xApt/awesome-bbht.sh
+git clone https://github.com/Palpatel276/bbht.git
 cd awesome-bbht
 chmod +x awesome-bbht.sh
 sudo ./awesome-bbht.sh
