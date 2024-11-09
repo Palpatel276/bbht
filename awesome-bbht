@@ -1,229 +1,781 @@
-# awesome-bbht
-A bash script that will automatically install a list of bug hunting tools I sometimes use for recon, exploitation, etc. (minus burp.) (Contributions are always welcome.)
+#!/bin/bash
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get install -y libcurl4-openssl-dev
+sudo apt-get install -y libssl-dev
+sudo apt-get install -y jq
+sudo apt-get install -y ruby-full
+sudo apt-get install -y libcurl4-openssl-dev libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential libgmp-dev zlib1g-dev
+sudo apt-get install -y build-essential libssl-dev libffi-dev python-dev
+sudo apt-get install -y python-setuptools
+sudo apt-get install -y libldns-dev
+sudo apt-get install -y python3-pip
+sudo apt-get install -y python-pip
+sudo apt-get install -y python-dnspython
+sudo apt-get install -y git
+sudo apt-get install -y rename
+sudo apt-get install -y xargs
+
+
+#create a directory for tools
+mkdir /opt/tools
+echo "done"
+
+#install go
+if [[ -z "$GOPATH" ]];then
+echo "It looks like go is not installed, would you like to install it now"
+PS3="Please select an option : "
+choices=("yes" "no")
+select choice in "${choices[@]}"; do
+        case $choice in
+                yes)
+
+					echo "Installing Golang"
+					wget https://dl.google.com/go/go1.17.6.linux-amd64.tar.gz
+					sudo tar -xvf go1.17.6.linux-amd64.tar.gz
+					sudo mv go /usr/local
+					export GOROOT=/usr/local/go
+					export GOPATH=$HOME/go
+					export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+					echo 'export GOROOT=/usr/local/go' >> ~/.bash_profile
+					echo 'export GOPATH=$HOME/go'	>> ~/.bash_profile			
+					echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' >> ~/.bash_profile	
+					source ~/.bash_profile
+					sleep 1
+					break
+					;;
+				no)
+					echo "Please install go and rerun this script"
+					echo "Aborting installation..."
+					exit 1
+					;;
+	esac	
+done
+fi
+
+
+#create content-discovery, subdomain, and other directories
+echo "Creating /opt/tools/subdomain-enum"
+mkdir /opt/tools/subdomain-enum
+echo "Creating /opt/tools/content-discovery"
+mkdir /opt/tools/content-discovery
+echo "Creating /opt/tools/other"
+mkdir /opt/tools/other 
+echo "Creating /opt/tools/CloudFlare"
+mkdir /opt/tool/CloudFlare
+
+
+#Don't forget to set up AWS credentials!
+echo "Don't forget to set up AWS credentials!"
+pip install awscli --upgrade --user
+echo "Don't forget to set up AWS credentials!"
+
+
+#install aquatone
+echo "Installing Aquatone"
+go get github.com/michenriksen/aquatone
+echo "done"
+
+
+#install knockpy
+echo "Installing knockpy"
+git clone https://github.com/guelfoweb/knock.git /opt/tools/subdomain-enum/knockpy
+echo "done"
+
+#install dnsenum
+echo "Installing dnsenum"
+sudo apt install libtest-www-mechanize-perl libnet-whois-ip-perl
+git clone https://github.com/fwaeytens/dnsenum /opt/tools/subdomain-enum/dnsenum
+
+
+#install subbrute
+echo "Installing subbrute"
+git clone https://github.com/TheRook/subbrute.git /opt/tools/subdomain-enum/subbrute
+echo "done"
+
+#install assetfinder
+echo "Installing asset finder"
+go get -u github.com/tomnomnom/assetfinder
+echo "done"
+
+#install domain-finder
+echo "Installing domain-finder"
+cd /opt/tools/subdomain-enum
+wget https://raw.githubusercontent.com/gwen001/pentest-tools/master/domain-finder.py 
+echo "done"
 
-## Install
+#install rsdl
+echo "Installing rsdl"
+go get github.com/tismayil/rsdl
+go build rsdl.go
 
-```sh
+#install subDomainizer
+echo "Installing subDomainizer"
+git clone https://github.com/nsonaniya2010/SubDomainizer.git /opt/tools/subdomain-enum/subDomainizer
+echo "done"
 
-git clone https://github.com/0xApt/awesome-bbht.sh
-cd awesome-bbht
-chmod +x awesome-bbht.sh
-sudo ./awesome-bbht.sh
-```
+#install domain_analyzer
+echo "Installing domain_analyzer"
+git clone https://github.com/eldraco/domain_analyzer.git /opt/tools/subdomain-enum/domain_analyzer
+echo "done"
 
-The list of tools downloaded: 
+#install massdns
+echo "Installing massdns"
+git clone https://github.com/blechschmidt/massdns.git /opt/tools/subdomain-enum/massdns
+echo "done"
 
->awscli
+#install subfinder
+echo "Installing subfinder"
+git clone https://github.com/subfinder/subfinder.git /opt/tools/subdomain-enum/subfinder
+cd /opt/tools/subdomain-enum/subfinder
+go get github.com/subfinder/subfinder
+echo "done"
 
-## Subdomain-enum
+#install amass
+echo "Installing amass"
+go get -u github.com/caffix/amass
+echo "done"
 
-- [aquatone](https://github.com/michenriksen/aquatone) - A Tool for Domain Flyovers
+#install sub.sh
+echo "Installing sub.sh"
+sudo apt-get install jq
+git clone https://github.com/cihanmehmet/sub.sh.git /opt/tools/subdomain-enum/sub.sh
+echo "done"
 
-- [knockpy](https://github.com/guelfoweb/knock) - Knockpy is a python tool designed to enumerate subdomains on a target domain through a wordlist.
+#install sublist3r
+echo "Installing Sublist3r"
+git clone https://github.com/aboul3la/Sublist3r.git /opt/tools/subdomain-enum/Sublist3r
+cd /opt/tools/subdomain-enum/Sublist3r
+pip install -r requirements.txt
+echo "done"
 
-- [subbrute](https://github.com/TheRook/subbrute) - A DNS meta-query spider that enumerates DNS records, and subdomains.
+#install Sudomy
+echo "Installing Sudomy"
+git clone --recursive https://github.com/screetsec/Sudomy.git /opt/tools/subdomain-enum/Sudomy
+cd /opt/tools/subdomain-enum/Sudomy
+pip install -r requirements.txt
+echo "done"
 
-- [assetfinder](https://github.com/tomnomnom/assetfinder) - Find domains and subdomains related to a given domain
 
-- [domain-finder](https://raw.githubusercontent.com/gwen001/pentest-tools/master/domain-finder.py)
 
-- [rsdl](https://github.com/tismayil/rsdl) - Subdomain Scan with the Ping Method
 
-- [subDomainizer](https://github.com/nsonaniya2010/SubDomainizer) - A tool to find subdomains and interesting things hidden inside, external Javascript files of page, folder, and Github.
+#############################################
 
-- [domain_analyzer](https://github.com/eldraco/domain_analyzer) - Analyze the security of any domain by finding all the information possible. Made in python.
+#               Content Discovery           #
 
-- [massdns](https://github.com/blechschmidt/massdns) - A high-performance DNS stub resolver for bulk lookups and reconnaissance (subdomain enumeration)
+#############################################
 
-- [subfinder](https://github.com/subfinder/subfinder) - Subfinder is a subdomain discovery tool that discovers valid subdomains for websites. Designed as a passive framework to be useful for bug bounties and safe for penetration testing. 
 
-- [amass](https://github.com/caffix/amass) - In-depth Attack Surface Mapping and Asset Discovery
 
-- [sub.sh](https://github.com/cihanmehmet/sub.sh) - Online Subdomain Detect Script
+###########################
 
-- [sublist3r](https://github.com/aboul3la/Sublist3r) - Fast subdomains enumeration tool for penetration testers
+#          API            # 
 
-- [Sudomy](https://github.com/Screetsec/Sudomy) - Sudomy is a subdomain enumeration tool, created using a bash script, to analyze domains and collect subdomains in fast and comprehensive way . Report output in HTML or CSV format https://github.com/Screetsec/
+###########################
 
-- [dnsenum](https://github.com/fwaeytens/dnsenum) - Multithreaded perl script to enumerate DNS information of a domain and to discover non-contiguous ip blocks.
 
-## Content Discovery
+#install secretx
+echo "installing secrtex"
+git clone https://github.com/xyele/secretx.git /opt/tools/content-discovery/api/secretx
+cd /opt/tools/content-discovery/api/secretx
+python3 -m pip install -r requirements.txt
+echo "done"
 
-### API
 
-- [secretx](https://github.com/xyele/secretx) - Extracting api keys and secrets by requesting each url in your list.
 
+###########################
 
-### AWS S3 Bucket
+#      AWS S3 Bucket      #
 
-- [s3brute](https://github.com/ghostlulzhacks/s3brute) - s3 brute force tool 
+###########################
 
-- [s3-bucket-finder](https://github.com/gwen001/s3-buckets-finder) - Find aws s3 buckets and extract datas. 
 
-- [bucket-stream](https://github.com/eth0izzle/bucket-stream) - Find interesting Amazon S3 Buckets by watching certificate transparency logs.
 
-- [slurp](https://github.com/nuncan/slurp) - Enumerate S3 buckets via certstream, domain, or keywords.
+#install s3brute
+echo "installing s3brute"
+git clone https://github.com/ghostlulzhacks/s3brute.git /opt/tools/content-discovery/AWS/s3brute
+echo "done"
 
-- [lazys3](https://github.com/nahamsec/lazys3) - A Ruby script to bruteforce for AWS s3 buckets using different permutations.
+#install s3-buckets-finder
+echo "installing s3-buckets-finder"
+git clone https://github.com/gwen001/s3-buckets-finder.git /opt/tools/content-discovery/AWS/s3-buckets-finder
+echo "done"
 
-- [cred_scanner](https://github.com/disruptops/cred_scanner) - 
-A simple file-based scanner to look for potential AWS access and secret keys in files
+#install bucket-stream
+echo "installing bucket-stream"
+git clone https://github.com/eth0izzle/bucket-stream.git /opt/tools/content-discovery/AWS/bucket-stream
+cd /opt/tools/content-discovery/AWS/bucket-stream
+pip3 install -r requirements.txt
+echo "done"
 
-- [DumpsterDiver](https://github.com/securing/DumpsterDiver) - A tool used to analyze big volumes of various file types in search of harcoded secrets like keys (AWS Access Key, Azuer Share Key or SSH keys) or passwords.
+#install slurp
+echo "installing slurp"
+go get github.com/nuncan/slurp
+echo "done"
 
-- [S3Scanner](https://github.com/sa7mon/S3Scanner) - Scan for open AWS S3 buckets and dump the contents
+#install lazys3
+echo "installing lazys3"
+git clone https://github.com/nahamsec/lazys3.git /opt/tools/content-discovery/AWS/lazys3
+echo "done"
 
-### Inspecting JS Files
+#install cred_scanner
+echo "installing cred_scanner"
+git clone https://github.com/disruptops/cred_scanner.git /opt/tools/content-discovery/AWS/cred_scanner
+cd /opt/tools/content-discovery/AWS/cred_scanner
+pip install -r requirements.txt
+echo "done"
 
-- [JSParser](https://github.com/nahamsec/JSParser) - A python 2.7 script using Tornado and JSBeautifier to parse relative URLs from JavaScript files. 
+#install DumpsterDiver
+echo "installing DumpsterDiver"
+git clone https://github.com/securing/DumpsterDiver.git /opt/tools/content-discovery/AWS/DumpsterDiver
+cd /opt/tools/content-discovery/AWS/DumpsterDiver
+pip install -r requirements.txt
+echo "done"
 
-- [relative-url-extractor](https://github.com/jobertabma/relative-url-extractor) - A small tool that extracts relative URLs from a file.
+#install S3Scanner
+echo "installing S3Scanner"
+git clone https://github.com/sa7mon/S3Scanner.git /opt/tools/content-discovery/AWS/S3Scanner 
+cd /opt/tools/content-discovery/AWS/S3Scanner
+pip install -r requirements.txt
+echo "done"
 
-- [github-search](https://raw.githubusercontent.com/gwen001/github-search/master/github-subdomains.py)
-- [sub.js](https://github.com/lc/subjs) - A tool to get javascript files from a list of URLS or subdomains
-- [LinkFinder](https://github.com/GerbenJavado/LinkFinder) - A python script that finds endpoints in JavaScript files
 
-### Code Audit
 
-- [Cobra](https://github.com/WhaleShark-Team/cobra) - Source Code Security Audit (源代码安全审计)
 
-### Crawlers
 
-- [Crawler](https://github.com/ghostlulzhacks/crawler) - Crawl website extract links
+###########################
 
-- [waybackMachine](https://github.com/ghostlulzhacks/waybackMachine) - Use wayback Machine data to pull a list of paths.
+#    Inspecting JS Files  #
 
-- [meg](https://github.com/tomnomnom/meg) - Fetch many paths for many hosts - without killing the hosts
+###########################
 
-- [hakrawler](https://github.com/hakluke/hakrawler) - Simple, fast web crawler designed for easy, quick discovery of endpoints and assets within a web application
 
-- [igoturls](https://github.com/xyele/igoturls) - WaybackURLS + OtxURLS + CommonCrawl
 
-### Directory Bruteforcers & Fuzzers
+#install JSParser
+echo "installing JSParser"
+git clone https://github.com/nahamsec/JSParser.git /opt/tools/content-discovery/JS/JSParser
+cd JSParser*
+sudo python setup.py install
+echo "done"
 
-- [gobuster](https://github.com/OJ/gobuster) - Directory/File, DNS and VHost busting tool written in Go
+#intall relative-url-extractor
+echo "installing relative-url-extractor"
+git clone https://github.com/jobertabma/relative-url-extractor.git /opt/tools/content-discovery/JS/relative-url-extractor
+echo "done"
 
-- [ffuf](https://github.com/ffuf/ffuf) - Fast web fuzzer written in Go
+#install github-search
+echo "installing github-search"
+cd /opt/tools/content-discovery/JS
+wget https://raw.githubusercontent.com/gwen001/github-search/master/github-subdomains.py
+echo "done"
 
-- [dirsearch](https://github.com/maurosoria/dirsearch) - Web path scanner
+#install subjs
+echo "installing subjs"
+go get -u github.com/lc/subjs
+echo "done"
 
-## Exploitation
+#install LinkFinder
+echo "install LinkFinder"
+git clone https://github.com/GerbenJavado/LinkFinder.git /opt/tools/content-discovery/JS/LinkFinder
+cd /opt/tools/content-discovery/JS/LinkFinder
+python3 -m pip install -r requirements.txt
+echo "done"
 
-### Subdomain Takeover
 
-- [subjack](https://github.com/haccer/subjack) - Subdomain Takeover tool written in Go
+###########################
 
-- [subdomain-takeover](https://github.com/antichown/subdomain-takeover) - Subdomain Takeover Scanner | Subdomain Takeover Tool | by 0x94
+#         Code Audit       #
 
-- [takeover](https://github.com/m4ll0k/takeover) - Sub-Domain TakeOver Vulnerability Scanner
+###########################
 
-- [SubOver](https://github.com/Ice3man543/SubOver) - A Powerful Subdomain Takeover Tool 
+#install Cobra
+echo "installing Cobra"
+git clone https://github.com/WhaleShark-Team/cobra.git /opt/tools/content-discovery/code_audit/Cobra
+cd /opt/tools/content-discovery/code_audit/Cobra
+pip install -r requirements.txt
+echo "done"
 
 
-### Google Cloud Storage
 
-- [GCPBucketBrute](https://github.com/RhinoSecurityLabs/GCPBucketBrute) - A script to enumerate Google Storage buckets, determine what access you have to them, and determine if they can be privilege escalated.
+###########################
 
-### Digital Ocean
+#         Crawlers        #
 
-- [spaces-finder](https://github.com/appsecco/spaces-finder) - A tool to hunt for publicly accessible DigitalOcean Spaces
+###########################
 
-### XXE
+#install crawler
+echo "installing crawler"
+git clone https://github.com/ghostlulzhacks/crawler.git /opt/tools/content-discovery/crawlers/crawler
+echo "done"
 
-- [XXEinjector](https://github.com/enjoiz/XXEinjector) - Tool for automatic exploitation of XXE vulnerability using direct and different out of band methods.
+#install waybackMachine
+echo "installing waybackMachine"
+git clone https://github.com/ghostlulzhacks/waybackMachine.git /opt/tools/content-discovery/crawlers/waybackMachine
+echo "done"
 
-### CSRF
+#install meg
+echo "installing meg"
+go get -u github.com/tomnomnom/meg
+echo "done"
 
-- [XSRFProbe](https://github.com/0xInfection/XSRFProbe) - The Prime Cross Site Request Forgery (CSRF) Audit and Exploitation Toolkit.
+#install hakrawler
+echo "installing hakrawler"
+go get github.com/hakluke/hakrawler
+echo "done"
 
-### Command Injection
+#install igoturls
+echo "installing igoturls"
+git clone https://github.com/xyele/igoturls.git /opt/tools/content-discovery/crawlers/igoturls
+echo "done"
 
-- [commix](https://github.com/commixproject/commix) - Automated All-in-One OS command injection and exploitation tool. https://commixproject.com
 
 
-### SQLi
 
-- [sqlmap](https://github.com/sqlmapproject/sqlmap) - Automatic SQL injection and database takeover tool http://sqlmap.org
 
-- [sqliv](https://github.com/the-robot/sqliv) - massive SQL injection vulnerability scanner
+###########################
 
-- [sqlmate](https://github.com/s0md3v/sqlmate) - A friend of SQLmap which will do what you always expected from SQLmap.
+#  Directory Bruteforcers #
 
-### XSS
+#           &             #
 
-- [XSStrike](https://github.com/s0md3v/XSStrike) - Most advanced XSS scanner.
+#         Fuzzers         #
+###########################
 
-- [XSS-keylogger](https://github.com/hadynz/xss-keylogger) - A keystroke logger to exploit XSS vulnerabilities in a site - for my personal Educational purposes only
 
+#install gobuster
+echo "installing gobuster"
+go get github.com/OJ/gobuster
+echo "done"
 
-## CMS
+#install ffuf
+echo "installing ffuf"
+go get github.com/ffuf/ffuf
+echo "done"
 
-- [CMSmap](https://github.com/Dionach/CMSmap) - CMSmap is a python open source CMS scanner that automates the process of detecting security flaws of the most popular CMSs.
+#install dirsearch
+echo "installing dirsearch"
+git clone https://github.com/maurosoria/dirsearch.git /opt/tools/dir-fuzz/dirsearch
+echo "done"
 
-- [CMSeeK](https://github.com/Tuhinshubhra/CMSeeK) - CMS Detection and Exploitation suite - Scan WordPress, Joomla, Drupal and over 170 other CMSs
 
-- [wpscan](https://github.com/wpscanteam/wpscan) - WPScan is a free, for non-commercial use, black box WordPress Vulnerability Scanner written for security professionals and blog maintainers to test the security of their WordPress websites
+#############################################
 
-- [Joomscan](https://github.com/rezasp/joomscan) - OWASP Joomla Vulnerability Scanner Project
+#                 Exploitation              #
 
-- [Droopescan](https://github.com/droope/droopescan) - 
-A plugin-based scanner that aids security researchers in identifying issues with several CMSs, mainly Drupal & Silverstripe.
+#############################################
 
-- [Drupwn](https://github.com/immunIT/drupwn) - Drupal enumeration & exploitation tool
 
-## CloudFlare
 
-- [CloudFail](https://github.com/m0rtem/CloudFail) - Utilize misconfigured DNS and old database records to find hidden IP's behind the CloudFlare network 
+###########################
 
-## Git
+#           API           #
 
-- [truffleHog](https://github.com/dxa4481/truffleHog.git) - Searches through git repositories for high entropy strings and secrets, digging deep into commit history 
+###########################
 
-- [git-dumper](https://github.com/arthaud/git-dumper) - A tool to dump a git repository from a website 
 
-## Frameworks
+#install imperva
+echo "installing imperva"
+git clone https://github.com/imperva/automatic-api-attack-tool.git /opt/tools/exploitation/api/imperva
+echo "done"
 
-- [Sn1per](https://github.com/1N3/Sn1per) - Automated pentest framework for offensive security experts
 
-- [XRay](https://github.com/evilsocket/xray) - XRay is a tool for recon, mapping and OSINT gathering from public networks.
 
-- [datasploit](https://github.com/DataSploit/datasploit) - An #OSINT Framework to perform various recon techniques on Companies, People, Phone Number, Bitcoin Addresses, etc., aggregate all the raw data, and give data in multiple formats.
+###########################
 
-- [Osmedeus](https://github.com/j3ssie/Osmedeus) - Fully automated offensive security framework for reconnaissance and vulnerability scanning
+#   Subdomain Takeover     #
 
-- [TIDoS-Framework](https://github.com/0xinfection/tidos-framework) - The Offensive Manual Web Application Penetration Testing Framework.
+###########################
 
-- [discover](https://github.com/leebaird/discover) - Custom bash scripts used to automate various penetration testing tasks including recon, scanning, parsing, and creating malicious payloads and listeners with Metasploit.
 
-- [lazyrecon](https://github.com/nahamsec/lazyrecon) - This script is intended to automate your reconnaissance process in an organized fashion
+#install subjack
+echo "installing subjack"
+go get github.com/haccer/subjack
+echo "done"
 
-- [003Recon](https://github.com/003random/003Recon) - Some tools to automate recon - 003random 
 
-- [LazyRecon](https://github.com/capt-meelo/LazyRecon) - An automated approach to performing recon for bug bounty hunting and penetration testing.
+#install subdomain-takeover
+echo "installing subdomain-takeover"
+git clone https://github.com/antichown/subdomain-takeover.git /opt/tools/exploitation/subdomain-takeover
+cd /opt/tools/exploitation/subdomain-takeover
+pip install -r requirements.txt
+echo "done"
 
-- [Vulmap](https://github.com/zhzyker/vulmap) - Vulmap is a web vulnerability scanning and verification tool that can scan webapps for vulnerabilities and has a vulnerability verification function 
+#install takeover
+echo "installing takeover"
+git clone https://github.com/m4ll0k/takeover.git /opt/tools/exploitation/takeover
+echo "done"
 
+#install SubOver
+echo "installing SubOver"
+go get github.com/Ice3man543/SubOver
 
-## Wordlists
 
-- [SecLists](https://github.com/danielmiessler/SecLists) - SecLists is the security tester's companion. It's a collection of multiple types of lists used during security assessments, collected in one place. List types include usernames, passwords, URLs, sensitive data patterns, fuzzing payloads, web shells, and many more.
+###########################
 
-- [Jhaddix Wordlist](https://gist.githubusercontent.com/jhaddix/b80ea67d85c13206125806f0828f4d10/raw/c81a34fe84731430741e0463eb6076129c20c4c0/content_discovery_all.txt)
+#   Google Cloud Storage  #
 
-- [Nahamsec list](https://gist.githubusercontent.com/Leoid/38984017886cd058a314dfda5c3d6c6e/raw/1ee5fe1da82a3ae92b0c486f86fbe26bbdff1e06/Nahamsec%2520Thread)
+###########################
 
-## Other
 
-- [altdns](https://github.com/infosec-au/altdns) - Generates permutations, alterations and mutations of subdomains and then resolves them
+#install GCPBucketBrute
+echo "installing GCPBucketBrute"
+git clone https://github.com/RhinoSecurityLabs/GCPBucketBrute.git /opt/tools/exploitation/google-cloud-storage/GCPBucketBrute
+cd /opt/tools/exploitation/google-cloud-storage/GCPBucketBrute
+python3 -m pip install -r requirements.txt
+echo "done"
 
-- [nmap](https://nmap.org/) - network mapper
 
-- [Blazy](https://github.com/s0md3v/Blazy) - Blazy is a modern login bruteforcer which also tests for CSRF, Clickjacking, Cloudflare and WAF. 
 
-- [httprobe](https://github.com/tomnomnom/httprobe) - 
-Take a list of domains and probe for working HTTP and HTTPS servers
+###########################
 
-- [broken-link-checker](https://github.com/stevenvachon/broken-link-checker) - 
-Find broken links, missing images, etc within your HTML.
+#      Digital Ocean      #
 
-- [wafw00f](https://github.com/EnableSecurity/wafw00f) - WAFW00F allows one to identify and fingerprint Web Application Firewall (WAF) products protecting a website. 
+###########################
+
+
+#install spaces-finder
+echo "installing spaces-finder"
+git clone https://github.com/appsecco/spaces-finder.git /opt/tools/exploitation/digital-ocean/spaces-finder
+cd /opt/tools/exploitation/digital-ocean/spaces-finder
+python3 -m pip install -r requirements.txt
+
+
+
+###########################
+
+#           XXE           #
+
+###########################
+
+
+#install XEEinjector
+echo "installing XEEinjector"
+git clone https://github.com/enjoiz/XXEinjector.git /opt/tools/exploitation/XXE/XXEinjector
+echo "done"
+
+
+
+###########################
+
+#          CSRF           #
+
+###########################
+
+#install XSRFProbe
+echo "installing XSRFProbe"
+git clone https://github.com/0xInfection/XSRFProbe.git /opt/tools/exploitation/CSRF/XSRFProbe
+cd /opt/tools/exploitation/CSRF/XSRFProbe
+python3 setup.py install
+echo "done"
+
+
+
+###########################
+
+#     Command injection   #
+
+###########################
+
+#install commix
+echo "installing commix"
+git clone https://github.com/commixproject/commix.git /opt/tools/exploitation/command-injection/commix
+echo "done"
+
+
+
+###########################
+
+#          SQLi           #
+
+###########################
+
+
+#install sqlmap
+echo "installing sqlmap"
+git clone https://github.com/sqlmapproject/sqlmap.git /opt/tools/exploitation/sqli/sqlmap
+echo "done"
+
+
+#install sqliv
+echo "installing sqliv"
+git clone https://github.com/the-robot/sqliv.git /opt/tools/exploitation/sqli/sqliv
+cd /opt/tools/exploitation/sqli/sqliv
+sudo python2 setup.py -i
+echo "done"
+
+#install sqlmate
+echo "installing sqlmate"
+git clone https://github.com/s0md3v/sqlmate.git /opt/tools/exploitation/sqli/sqlmate
+cd /opt/tools/exploitation/sqli/sqlmate
+pip install -r requirements.txt
+echo "done"
+
+
+
+
+###########################
+
+#           XSS           #
+
+###########################
+
+
+#install XSStrike
+echo "installing XSStrike"
+git clone https://github.com/s0md3v/XSStrike.git /opt/tools/exploitation/xss/XSStrike
+cd /opt/tools/exploitation/xss/XSStrike
+python3 -m pip install -r requirements.txt
+echo "done"
+
+#install XSS-keylogger
+echo "installing XSS-keylogger"
+git clone https://github.com/hadynz/xss-keylogger.git /opt/tools/exploitation/xss/XSS-keylogger
+echo "done"
+
+
+
+###########################
+
+#      Open Redirect      #
+
+###########################
+
+#spot left for potential open redirect testing tools
+
+
+###########################
+
+#        CloudFlare       #
+
+###########################
+#install CloudFail
+echo "installing CloudFail"
+git clone https://github.com/m0rtem/CloudFail.git /opt/tools/CloudFlare/CloudFail
+echo "done"
+
+
+###########################
+
+#    	     Git          #
+
+###########################
+
+#installing truffleHog
+echo "installing truffleHog"
+python3 -m pip install trufflehog
+
+#installing 
+echo "installing git-dumper"
+git clone https://github.com/arthaud/git-dumper.git /opt/tools/Git/git-dumper
+
+
+
+#############################################
+
+#                    CMS                    #   
+
+#############################################
+
+
+#install CMSmap
+echo "installing CMSmap"
+git clone https://github.com/Dionach/CMSmap.git /opt/tools/CMS/CMSmap
+cd /opt/tools/CMS/CMSmap
+pip3 install .
+echo "done"
+
+#install CMSeek
+echo "installing CMSeek"
+git clone https://github.com/Tuhinshubhra/CMSeeK.git /opt/tools/CMS/CMSeek
+cd /opt/tools/CMS/CMSeek
+python3 -m pip install -r requirements.txt
+echo "done"
+
+#install Joomscan
+echo "installing Joomscan"
+git clone https://github.com/rezasp/joomscan.git /opt/tools/CMS/Joomscan
+echo "done"
+
+#install wpscan
+echo "installing wpscan"
+gem install wpscan
+echo "done"
+
+#install droopescan
+echo "installing droopescan"
+apt-get install python-pip
+pip install droopescan
+echo "done"
+
+#install drupwn
+echo "installing drupwn"
+git clone https://github.com/immunIT/drupwn.git /opt/tools/CMS/drupwn
+cd /opt/tools/CMS/drupwn
+python3 setup.py install
+drupwn --help
+echo "done"
+
+
+
+
+#############################################
+
+#                Frameworks                 #
+
+#############################################
+
+#install Sn1per
+echo "installing Sn1per"
+git clone https://github.com/1N3/Sn1per.git /opt/tools/Frameworks/Sn1per
+cd /opt/tools/Frameworks/Sn1per
+bash install.sh
+echo "done"
+
+
+#install XRay
+echo "installing XRay"
+go get github.com/evilsocket/xray
+cd $GOPATH/src/github.com/evilsocket/xray/
+make
+echo "done"
+
+
+
+#install datasploit
+echo "installing datasploit"
+git clone https://github.com/DataSploit/datasploit.git /opt/tools/Frameworks/datasploit
+cd /opt/tools/Frameworks/datasploit
+python3 -m pip install --upgrade --force-reinstall -r requirements.txt
+echo "done"
+
+
+
+#install Osmedeus
+echo "installing Osmedeus"
+git clone https://github.com/j3ssie/Osmedeus.git /opt/tools/Frameworks/osmedeus
+cd /opt/tools/Frameworks/osmedeus
+./install.sh
+echo "done"
+
+
+
+#install TIDoS-Framework
+echo "installing TIDoS-Framework"
+git clone https://github.com/0xinfection/tidos-framework.git /opt/tools/Frameworks/TIDoS-Framework
+cd /opt/tools/Frameworks/osmedeus
+chmod +x install
+./install
+echo "done"
+
+
+
+#install discover
+echo "installing discover"
+git clone https://github.com/leebaird/discover.git /opt/tools/Frameworks/discover
+cd /opt/tools/Frameworks/discover
+./update.sh
+echo "done"
+
+
+
+#install lazyrecon
+echo "installing lazyrecon"
+git clone https://github.com/nahamsec/lazyrecon.git /opt/tools/Frameworks/lazyrecon
+echo "done"
+
+
+
+#install 003Recon
+echo "installing 003Recon"
+git clone https://github.com/003random/003Recon.git /opt/tools/Frameworks/003Recon
+cd /opt/tools/Frameworks/003Recon
+./install.sh
+echo "done"
+
+
+#install LazyRecon
+echo "installing LazyRecon"
+echo "remember to set API keys!!"
+git clone https://github.com/capt-meelo/LazyRecon.git /opt/tools/Frameworks/LazyRecon
+echo "done"
+
+
+#install Vulmap
+echo "installing Vulmap"
+git clone https://github.com/zhzyker/vulmap.git /opt/tools/Frameworks/Vulmap
+cd /opt/tools/Frameworks/Vulmap
+python3 -m pip install -r requirements.txt
+echo "done"
+
+
+#############################################
+
+#                  Other                    #
+
+#############################################
+
+
+#install altdns
+echo "installing altdns"
+pip install py-altdns
+echo "done"
+
+#install nmap
+echo "installing nmap"
+sudo apt-get install -y nmap
+echo "done"
+
+#install Blazy
+echo "installing Blazy"
+git clone https://github.com/s0md3v/Blazy.git /opt/tools/other/Blazy
+cd /opt/tools/other/Blazy
+pip install -r requirements.txt
+echo "done"
+
+
+
+#install httprobe
+echo "installing httprobe"
+go get -u github.com/tomnomnom/httprobe
+echo "done"
+
+#install broken-link-checker
+echo "installing broken-link-checker"
+npm install broken-link-checker -g
+echo "done"
+
+#install wafw00f -it is great tool to identify web application firewall      
+echo "installing wa00f"
+git clone https://github.com/EnableSecurity/wafw00f.git
+python3 wafw00f/setup.py install
+echo "done"
+
+###########################
+
+#         Wordlists       #
+
+###########################
+
+
+
+#install Seclists
+echo "downloading Seclist"
+git clone https://github.com/danielmiessler/SecLists.git /opt/tools/Wordlists/SecLists
+echo "done"
+cd /opt/tools/Wordlists/SecLists/Discovery/DNS/
+##THIS FILE BREAKS MASSDNS AND NEEDS TO BE CLEANED
+cat dns-Jhaddix.txt | head -n -14 > clean-jhaddix-dns.txt
+
+
+#install JHaddix Wordlist
+echo "downloading JHaddix wordlist"
+cd /opt/tools/Wordlists
+wget https://gist.githubusercontent.com/jhaddix/b80ea67d85c13206125806f0828f4d10/raw/c81a34fe84731430741e0463eb6076129c20c4c0/content_discovery_all.txt
+echo "done"
+
+#install Nahamsec list
+echo "downloading Nahamsec list"
+cd /opt/tools/Wordlists
+wget https://gist.githubusercontent.com/Leoid/38984017886cd058a314dfda5c3d6c6e/raw/1ee5fe1da82a3ae92b0c486f86fbe26bbdff1e06/Nahamsec%2520Thread
+echo "done"
